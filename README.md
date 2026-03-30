@@ -132,7 +132,7 @@ app.js
 - [x] Geolocation + reverse geocoding via OpenStreetMap Nominatim
 
 ### Future Ideas
-- [ ] Map integration (Google Maps or Leaflet.js)
+- [x] Map integration (Leaflet.js + OpenStreetMap)
 - [ ] Infinite scroll / pagination
 - [ ] Share event via Web Share API
 - [ ] Service Worker for offline support
