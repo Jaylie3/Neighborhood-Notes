@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Neighborhood Notes 🎵</title>
+  <title>Neighborhood Notes</title>
   <link rel="stylesheet" href="styles.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link
-    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
     rel="stylesheet"
   />
 </head>
@@ -16,27 +16,36 @@
   <header class="header">
     <div class="header-inner container">
       <div class="logo">
-        <span class="logo-icon">🎵</span>
+        <iconify-icon icon="ph:music-notes-fill" class="logo-icon" aria-hidden="true"></iconify-icon>
         <span class="logo-text">Neighborhood Notes</span>
       </div>
       <nav class="header-actions">
         <button id="favorites-btn" class="btn btn-outline" aria-label="View saved favorites">
-          ❤️ Favorites <span id="fav-count" class="badge hidden">0</span>
+          <iconify-icon icon="ph:heart-fill" aria-hidden="true"></iconify-icon> Favorites
+          <span id="fav-count" class="badge hidden">0</span>
         </button>
-        <button id="dark-mode-toggle" class="btn btn-icon" aria-label="Toggle dark mode" title="Toggle dark mode">🌙</button>
+        <button id="dark-mode-toggle" class="btn btn-icon" aria-label="Toggle dark mode" title="Toggle dark mode">
+          <iconify-icon icon="ph:moon-fill" id="theme-icon" aria-hidden="true"></iconify-icon>
+        </button>
       </nav>
     </div>
   </header>
 
   <!-- Hero / Search -->
   <section class="hero">
-    <div class="container">
+    <!-- Aurora animated background blobs -->
+    <div class="hero-aurora" aria-hidden="true">
+      <div class="aurora-blob aurora-1"></div>
+      <div class="aurora-blob aurora-2"></div>
+      <div class="aurora-blob aurora-3"></div>
+    </div>
+    <div class="container hero-content">
       <h1 class="hero-title">Discover Live Music Near You</h1>
       <p class="hero-subtitle">Find concerts, open mic nights, and live music events in your neighborhood</p>
 
       <div class="search-bar">
         <div class="search-input-wrap">
-          <span class="search-icon">📍</span>
+          <iconify-icon icon="ph:map-pin-fill" class="search-icon" aria-hidden="true"></iconify-icon>
           <input
             type="text"
             id="location-input"
@@ -46,17 +55,20 @@
           />
         </div>
         <button id="use-location-btn" class="btn btn-secondary" title="Use my current location">
-          📡 Use My Location
+          <iconify-icon icon="ph:navigation-arrow-fill" aria-hidden="true"></iconify-icon> Use My Location
         </button>
         <button id="search-btn" class="btn btn-primary">
-          🔍 Search
+          <iconify-icon icon="ph:magnifying-glass-bold" aria-hidden="true"></iconify-icon> Search
         </button>
       </div>
 
       <!-- API Key Banner -->
       <div id="api-key-banner" class="api-key-banner">
         <details>
-          <summary>⚙️ Configure Eventbrite API Key (optional — demo data shown by default)</summary>
+          <summary>
+            <iconify-icon icon="ph:gear-six-fill" aria-hidden="true"></iconify-icon>
+            Configure Eventbrite API Key (optional — demo data shown by default)
+          </summary>
           <div class="api-key-form">
             <p>To fetch real events, enter your <a href="https://www.eventbrite.com/platform/api" target="_blank" rel="noopener">Eventbrite API key</a>.</p>
             <div class="api-key-row">
@@ -80,12 +92,24 @@
   <!-- Filters -->
   <section class="filters-section container">
     <div class="filters" role="group" aria-label="Filter events by category">
-      <button class="filter-btn active" data-filter="all">All Events</button>
-      <button class="filter-btn" data-filter="concert">🎸 Concerts</button>
-      <button class="filter-btn" data-filter="open-mic">🎤 Open Mic</button>
-      <button class="filter-btn" data-filter="live-music">🎶 Live Music</button>
-      <button class="filter-btn" data-filter="jazz">🎷 Jazz</button>
-      <button class="filter-btn" data-filter="hip-hop">🎧 Hip-Hop</button>
+      <button class="filter-btn active" data-filter="all">
+        <iconify-icon icon="ph:squares-four-fill" aria-hidden="true"></iconify-icon> All Events
+      </button>
+      <button class="filter-btn" data-filter="concert">
+        <iconify-icon icon="ph:guitar-fill" aria-hidden="true"></iconify-icon> Concerts
+      </button>
+      <button class="filter-btn" data-filter="open-mic">
+        <iconify-icon icon="ph:microphone-fill" aria-hidden="true"></iconify-icon> Open Mic
+      </button>
+      <button class="filter-btn" data-filter="live-music">
+        <iconify-icon icon="ph:music-note-fill" aria-hidden="true"></iconify-icon> Live Music
+      </button>
+      <button class="filter-btn" data-filter="jazz">
+        <iconify-icon icon="mdi:saxophone" aria-hidden="true"></iconify-icon> Jazz
+      </button>
+      <button class="filter-btn" data-filter="hip-hop">
+        <iconify-icon icon="ph:headphones-fill" aria-hidden="true"></iconify-icon> Hip-Hop
+      </button>
     </div>
     <div class="results-meta">
       <span id="results-count" class="results-count"></span>
@@ -98,15 +122,21 @@
 
   <!-- Main Content -->
   <main class="container main-content">
-    <!-- Loading Spinner -->
+    <!-- Loading Dots Spinner (uiverse.io inspired) -->
     <div id="loading" class="loading hidden" aria-live="polite" aria-label="Loading events">
-      <div class="spinner"></div>
+      <div class="dots-loader">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
       <p>Finding events near you…</p>
     </div>
 
     <!-- Empty State -->
     <div id="empty-state" class="empty-state hidden">
-      <div class="empty-icon">🎵</div>
+      <div class="empty-icon">
+        <iconify-icon icon="ph:music-notes" aria-hidden="true"></iconify-icon>
+      </div>
       <h2>No events found</h2>
       <p>Try a different city or adjust your filters.</p>
       <button id="load-demo-btn" class="btn btn-primary">Load Demo Events</button>
@@ -114,7 +144,9 @@
 
     <!-- Error State -->
     <div id="error-state" class="error-state hidden">
-      <div class="error-icon">⚠️</div>
+      <div class="error-icon">
+        <iconify-icon icon="ph:warning-circle-fill" aria-hidden="true"></iconify-icon>
+      </div>
       <h2>Something went wrong</h2>
       <p id="error-message">Unable to fetch events. Please try again.</p>
       <button id="retry-btn" class="btn btn-primary">Retry</button>
@@ -126,12 +158,16 @@
     <!-- Favorites Panel (hidden by default) -->
     <div id="favorites-panel" class="favorites-panel hidden">
       <div class="favorites-header">
-        <h2>❤️ Saved Events</h2>
-        <button id="close-favorites-btn" class="btn btn-icon" aria-label="Close favorites">✕</button>
+        <h2>
+          <iconify-icon icon="ph:heart-fill" aria-hidden="true"></iconify-icon> Saved Events
+        </h2>
+        <button id="close-favorites-btn" class="btn btn-icon" aria-label="Close favorites">
+          <iconify-icon icon="ph:x-bold" aria-hidden="true"></iconify-icon>
+        </button>
       </div>
       <div id="favorites-grid" class="events-grid"></div>
       <div id="favorites-empty" class="empty-state hidden">
-        <p>No saved events yet. Click ❤️ on any event to save it!</p>
+        <p>No saved events yet. Click <iconify-icon icon="ph:heart-fill" aria-hidden="true"></iconify-icon> on any event to save it!</p>
       </div>
     </div>
   </main>
@@ -139,26 +175,36 @@
   <!-- Event Detail Modal -->
   <div id="modal-overlay" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="modal-title">
     <div class="modal">
-      <button class="modal-close" id="modal-close-btn" aria-label="Close modal">✕</button>
+      <button class="modal-close" id="modal-close-btn" aria-label="Close modal">
+        <iconify-icon icon="ph:x-bold" aria-hidden="true"></iconify-icon>
+      </button>
       <div id="modal-image-wrap" class="modal-image-wrap">
         <img id="modal-image" src="" alt="" class="modal-image" />
-        <div class="modal-image-placeholder hidden">🎵</div>
+        <div class="modal-image-placeholder hidden">
+          <iconify-icon icon="ph:music-notes-fill" aria-hidden="true"></iconify-icon>
+        </div>
       </div>
       <div class="modal-body">
         <div class="modal-tags" id="modal-tags"></div>
         <h2 class="modal-title" id="modal-title"></h2>
         <div class="modal-meta">
-          <span id="modal-date">📅</span>
-          <span id="modal-time">🕐</span>
-          <span id="modal-venue">📍</span>
+          <span id="modal-date">
+            <iconify-icon icon="ph:calendar-dots-fill" aria-hidden="true"></iconify-icon>
+          </span>
+          <span id="modal-time">
+            <iconify-icon icon="ph:clock-fill" aria-hidden="true"></iconify-icon>
+          </span>
+          <span id="modal-venue">
+            <iconify-icon icon="ph:map-pin-fill" aria-hidden="true"></iconify-icon>
+          </span>
         </div>
         <div class="modal-description" id="modal-description"></div>
         <div class="modal-actions">
           <a id="modal-ticket-link" href="#" target="_blank" rel="noopener" class="btn btn-primary btn-large">
-            🎟️ Get Tickets
+            <iconify-icon icon="ph:ticket-fill" aria-hidden="true"></iconify-icon> Get Tickets
           </a>
           <button id="modal-fav-btn" class="btn btn-outline btn-large">
-            ❤️ Save Event
+            <iconify-icon icon="ph:heart" aria-hidden="true"></iconify-icon> Save Event
           </button>
         </div>
       </div>
@@ -172,7 +218,8 @@
   <footer class="footer">
     <div class="container">
       <p>
-        🎵 Neighborhood Notes — Powered by
+        <iconify-icon icon="ph:music-notes-fill" aria-hidden="true"></iconify-icon>
+        Neighborhood Notes — Powered by
         <a href="https://www.eventbrite.com/platform/api" target="_blank" rel="noopener">Eventbrite API</a>
       </p>
       <p class="footer-note">
@@ -181,6 +228,7 @@
     </div>
   </footer>
 
+  <script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js" defer></script>
   <script src="app.js"></script>
 </body>
 </html>
