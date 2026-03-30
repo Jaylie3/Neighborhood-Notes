@@ -71,6 +71,8 @@ const DEMO_EVENTS = [
     ticket_availability: { minimum_ticket_price: { major_value: '25.00', currency: 'USD' } },
     _category: 'jazz',
     _demo: true,
+    _lat: 41.8781,
+    _lon: -87.6298,
   },
   {
     id: 'demo-2',
@@ -84,6 +86,8 @@ const DEMO_EVENTS = [
     is_free: true,
     _category: 'open-mic',
     _demo: true,
+    _lat: 40.6782,
+    _lon: -73.9442,
   },
   {
     id: 'demo-3',
@@ -98,6 +102,8 @@ const DEMO_EVENTS = [
     ticket_availability: { minimum_ticket_price: { major_value: '15.00', currency: 'USD' } },
     _category: 'hip-hop',
     _demo: true,
+    _lat: 33.7490,
+    _lon: -84.3880,
   },
   {
     id: 'demo-4',
@@ -112,6 +118,8 @@ const DEMO_EVENTS = [
     ticket_availability: { minimum_ticket_price: { major_value: '35.00', currency: 'USD' } },
     _category: 'concert',
     _demo: true,
+    _lat: 37.7749,
+    _lon: -122.4194,
   },
   {
     id: 'demo-5',
@@ -126,6 +134,8 @@ const DEMO_EVENTS = [
     ticket_availability: { minimum_ticket_price: { major_value: '12.00', currency: 'USD' } },
     _category: 'live-music',
     _demo: true,
+    _lat: 30.2672,
+    _lon: -97.7431,
   },
   {
     id: 'demo-6',
@@ -140,6 +150,8 @@ const DEMO_EVENTS = [
     ticket_availability: { minimum_ticket_price: { major_value: '20.00', currency: 'USD' } },
     _category: 'live-music',
     _demo: true,
+    _lat: 29.7604,
+    _lon: -95.3698,
   },
 ];
 
@@ -272,6 +284,19 @@ const Favorites = {
 /* ============================================================
    Helpers
    ============================================================ */
+
+/** Return [lat, lon] for an event, or null if unavailable */
+function getEventCoords(event) {
+  // Demo events carry explicit coords
+  if (event._lat != null && event._lon != null) {
+    return [event._lat, event._lon];
+  }
+  // Real Eventbrite events include venue lat/lon when expanded
+  const lat = parseFloat(event.venue?.latitude);
+  const lon = parseFloat(event.venue?.longitude);
+  if (!isNaN(lat) && !isNaN(lon)) return [lat, lon];
+  return null;
+}
 
 /** Format a date string from Eventbrite (local ISO) */
 function formatDate(isoString) {
@@ -529,7 +554,14 @@ const UI = {
       filtered.sort((a, b) => (a.name?.text || '').localeCompare(b.name?.text || ''));
     }
 
-    this.renderEvents(filtered);
+    if (MapView.active) {
+      // Update results count and refresh map markers
+      document.getElementById('results-count').textContent =
+        filtered.length ? `${filtered.length} event${filtered.length !== 1 ? 's' : ''} found` : '';
+      MapView.show(filtered);
+    } else {
+      this.renderEvents(filtered);
+    }
   },
 
   /** Update the favorite count badge in the header */
@@ -589,6 +621,91 @@ const UI = {
 };
 
 /* ============================================================
+   MapView — Leaflet map integration
+   ============================================================ */
+const MapView = {
+  _map: null,
+  _markers: null,
+  active: false,
+
+  /** Initialise the Leaflet map (idempotent) */
+  _init() {
+    if (this._map) return;
+    this._map = L.map('map-view', { zoomControl: true });
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+      maxZoom: 19,
+    }).addTo(this._map);
+    this._markers = L.layerGroup().addTo(this._map);
+  },
+
+  /** Show the map and render markers for the given events */
+  show(events) {
+    const mapEl = document.getElementById('map-view');
+    const gridEl = document.getElementById('events-grid');
+    mapEl.classList.remove('hidden');
+    gridEl.classList.add('hidden');
+
+    this._init();
+
+    // Trigger Leaflet resize after the container becomes visible
+    setTimeout(() => this._map.invalidateSize(), 50);
+
+    this._markers.clearLayers();
+
+    const bounds = [];
+    events.forEach((event) => {
+      const coords = getEventCoords(event);
+      if (!coords) return;
+
+      bounds.push(coords);
+
+      const name = event.name?.text || 'Event';
+      const venueName = event.venue?.name || 'Venue TBA';
+      const dateStr = formatDate(event.start?.local);
+      const price = formatPrice(event);
+      const categoryLabel = CATEGORY_LABELS[event._category] || CATEGORY_LABELS.music;
+
+      const marker = L.marker(coords);
+      marker.bindPopup(
+        `<div class="map-popup">
+          <span class="map-popup-category">${categoryLabel}</span>
+          <strong class="map-popup-name">${name}</strong>
+          <span class="map-popup-venue">📍 ${venueName}</span>
+          <span class="map-popup-date">📅 ${dateStr}</span>
+          <span class="map-popup-price">${price}</span>
+          <button class="map-popup-details btn btn-primary" data-map-event-id="${event.id}">View Details →</button>
+        </div>`,
+        { maxWidth: 260 }
+      );
+      marker.on('popupopen', () => {
+        // Attach click handler after popup is inserted into DOM
+        setTimeout(() => {
+          const btn = document.querySelector(`.map-popup-details[data-map-event-id="${event.id}"]`);
+          if (btn) {
+            btn.addEventListener('click', () => {
+              marker.closePopup();
+              UI.openModal(event);
+            });
+          }
+        }, 0);
+      });
+      this._markers.addLayer(marker);
+    });
+
+    if (bounds.length > 0) {
+      this._map.fitBounds(bounds, { padding: [40, 40], maxZoom: 13 });
+    }
+  },
+
+  /** Hide the map and show the events grid */
+  hide() {
+    document.getElementById('map-view').classList.add('hidden');
+    document.getElementById('events-grid').classList.remove('hidden');
+  },
+};
+
+/* ============================================================
    normalizeEvent — add derived fields for consistent rendering
    ============================================================ */
 function normalizeEvent(event, filterKeyword) {
@@ -631,6 +748,28 @@ const App = {
 
   /** Bind all DOM event listeners */
   bindEvents() {
+    // View toggle (list / map)
+    document.getElementById('list-view-btn').addEventListener('click', () => {
+      if (!MapView.active) return;
+      MapView.active = false;
+      MapView.hide();
+      document.getElementById('list-view-btn').classList.add('active');
+      document.getElementById('list-view-btn').setAttribute('aria-pressed', 'true');
+      document.getElementById('map-view-btn').classList.remove('active');
+      document.getElementById('map-view-btn').setAttribute('aria-pressed', 'false');
+      UI.applyFilterAndRender();
+    });
+
+    document.getElementById('map-view-btn').addEventListener('click', () => {
+      if (MapView.active) return;
+      MapView.active = true;
+      document.getElementById('map-view-btn').classList.add('active');
+      document.getElementById('map-view-btn').setAttribute('aria-pressed', 'true');
+      document.getElementById('list-view-btn').classList.remove('active');
+      document.getElementById('list-view-btn').setAttribute('aria-pressed', 'false');
+      UI.applyFilterAndRender();
+    });
+
     // Search
     document.getElementById('search-btn').addEventListener('click', () => this.search());
     document.getElementById('location-input').addEventListener('keydown', (e) => {
@@ -657,7 +796,18 @@ const App = {
     });
 
     // Favorites
-    document.getElementById('favorites-btn').addEventListener('click', () => UI.showFavorites());
+    document.getElementById('favorites-btn').addEventListener('click', () => {
+      // Switch back to list view if map is active
+      if (MapView.active) {
+        MapView.active = false;
+        MapView.hide();
+        document.getElementById('list-view-btn').classList.add('active');
+        document.getElementById('list-view-btn').setAttribute('aria-pressed', 'true');
+        document.getElementById('map-view-btn').classList.remove('active');
+        document.getElementById('map-view-btn').setAttribute('aria-pressed', 'false');
+      }
+      UI.showFavorites();
+    });
     document.getElementById('close-favorites-btn').addEventListener('click', () => {
       document.getElementById('favorites-panel').classList.add('hidden');
     });

@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Neighborhood Notes</title>
   <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link
     href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
@@ -113,6 +114,10 @@
     </div>
     <div class="results-meta">
       <span id="results-count" class="results-count"></span>
+      <div class="view-toggle-group" role="group" aria-label="Toggle view">
+        <button id="list-view-btn" class="btn btn-icon view-toggle-btn active" title="List view" aria-pressed="true">☰</button>
+        <button id="map-view-btn" class="btn btn-icon view-toggle-btn" title="Map view" aria-pressed="false">🗺️</button>
+      </div>
       <select id="sort-select" class="sort-select" aria-label="Sort events">
         <option value="date">Sort by Date</option>
         <option value="name">Sort by Name</option>
@@ -151,6 +156,9 @@
       <p id="error-message">Unable to fetch events. Please try again.</p>
       <button id="retry-btn" class="btn btn-primary">Retry</button>
     </div>
+
+    <!-- Map View -->
+    <div id="map-view" class="map-view hidden" aria-label="Events map"></div>
 
     <!-- Events Grid -->
     <div id="events-grid" class="events-grid" aria-label="Events list"></div>
@@ -229,6 +237,7 @@
   </footer>
 
   <script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js" defer></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV/XN/WLfU=" crossorigin=""></script>
   <script src="app.js"></script>
 </body>
 </html>
