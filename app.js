@@ -43,14 +43,14 @@ const FILTER_KEYWORDS = {
   'hip-hop': 'hip-hop',
 };
 
-/** Emoji/label for categories */
+/** Labels for categories */
 const CATEGORY_LABELS = {
-  concert: '🎸 Concert',
-  'open-mic': '🎤 Open Mic',
-  'live-music': '🎶 Live Music',
-  jazz: '🎷 Jazz',
-  'hip-hop': '🎧 Hip-Hop',
-  music: '🎵 Music',
+  concert: 'Concert',
+  'open-mic': 'Open Mic',
+  'live-music': 'Live Music',
+  jazz: 'Jazz',
+  'hip-hop': 'Hip-Hop',
+  music: 'Music',
 };
 
 /* ============================================================
@@ -385,9 +385,9 @@ const UI = {
         const saved = Favorites.toggle(event);
         btn.classList.toggle('active', saved);
         btn.setAttribute('aria-label', saved ? 'Remove from favorites' : 'Save to favorites');
-        btn.textContent = saved ? '❤️' : '🤍';
+        btn.innerHTML = `<iconify-icon icon="${saved ? 'ph:heart-fill' : 'ph:heart'}" aria-hidden="true"></iconify-icon>`;
         this.updateFavCount();
-        showToast(saved ? '❤️ Event saved!' : '🤍 Event removed from favorites');
+        showToast(saved ? 'Event saved!' : 'Event removed from favorites');
       });
     });
   },
@@ -412,20 +412,20 @@ const UI = {
       >
         <div class="event-image-wrap">
           ${imageUrl
-            ? `<img class="event-image" src="${imageUrl}" alt="${name.replace(/"/g, '&quot;')}" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" /><div class="event-image-placeholder" style="display:none">🎵</div>`
-            : `<div class="event-image-placeholder">🎵</div>`
+            ? `<img class="event-image" src="${imageUrl}" alt="${name.replace(/"/g, '&quot;')}" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" /><div class="event-image-placeholder" style="display:none"><iconify-icon icon="ph:music-notes-fill" aria-hidden="true"></iconify-icon></div>`
+            : `<div class="event-image-placeholder"><iconify-icon icon="ph:music-notes-fill" aria-hidden="true"></iconify-icon></div>`
           }
           <span class="event-category-badge">${categoryLabel}</span>
           <button
             class="event-fav-btn ${saved ? 'active' : ''}"
             data-fav-id="${event.id}"
             aria-label="${saved ? 'Remove from favorites' : 'Save to favorites'}"
-          >${saved ? '❤️' : '🤍'}</button>
+          ><iconify-icon icon="${saved ? 'ph:heart-fill' : 'ph:heart'}" aria-hidden="true"></iconify-icon></button>
         </div>
         <div class="event-body">
           <h3 class="event-name">${name}</h3>
-          <p class="event-date">📅 ${dateStr}</p>
-          <p class="event-venue">📍 ${venueName}</p>
+          <p class="event-date"><iconify-icon icon="ph:calendar-dots-fill" aria-hidden="true"></iconify-icon> ${dateStr}</p>
+          <p class="event-venue"><iconify-icon icon="ph:map-pin-fill" aria-hidden="true"></iconify-icon> ${venueName}</p>
         </div>
         <div class="event-footer">
           <span class="event-price">${price}</span>
@@ -453,9 +453,9 @@ const UI = {
     // Populate modal
     document.getElementById('modal-title').textContent = name;
     document.getElementById('modal-description').textContent = description;
-    document.getElementById('modal-date').textContent = `📅 ${dateStr}`;
-    document.getElementById('modal-time').textContent = `🕐 ${timeStr}`;
-    document.getElementById('modal-venue').textContent = `📍 ${venueText}`;
+    document.getElementById('modal-date').innerHTML = `<iconify-icon icon="ph:calendar-dots-fill" aria-hidden="true"></iconify-icon> ${dateStr}`;
+    document.getElementById('modal-time').innerHTML = `<iconify-icon icon="ph:clock-fill" aria-hidden="true"></iconify-icon> ${timeStr}`;
+    document.getElementById('modal-venue').innerHTML = `<iconify-icon icon="ph:map-pin-fill" aria-hidden="true"></iconify-icon> ${venueText}`;
 
     const tagEl = document.getElementById('modal-tags');
     tagEl.innerHTML = `<span class="modal-tag">${categoryLabel}</span>`;
@@ -465,7 +465,9 @@ const UI = {
     ticketLink.style.display = ticketUrl === '#' ? 'none' : '';
 
     const favBtn = document.getElementById('modal-fav-btn');
-    favBtn.textContent = saved ? '❤️ Saved' : '🤍 Save Event';
+    favBtn.innerHTML = saved
+      ? '<iconify-icon icon="ph:heart-fill" aria-hidden="true"></iconify-icon> Saved'
+      : '<iconify-icon icon="ph:heart" aria-hidden="true"></iconify-icon> Save Event';
     favBtn.dataset.modalEventId = event.id;
 
     const imgEl = document.getElementById('modal-image');
@@ -492,15 +494,17 @@ const UI = {
     // Store event reference for the fav btn
     favBtn.onclick = () => {
       const isNowSaved = Favorites.toggle(event);
-      favBtn.textContent = isNowSaved ? '❤️ Saved' : '🤍 Save Event';
+      favBtn.innerHTML = isNowSaved
+        ? '<iconify-icon icon="ph:heart-fill" aria-hidden="true"></iconify-icon> Saved'
+        : '<iconify-icon icon="ph:heart" aria-hidden="true"></iconify-icon> Save Event';
       // Update the card too
       const cardFavBtn = document.querySelector(`.event-fav-btn[data-fav-id="${event.id}"]`);
       if (cardFavBtn) {
         cardFavBtn.classList.toggle('active', isNowSaved);
-        cardFavBtn.textContent = isNowSaved ? '❤️' : '🤍';
+        cardFavBtn.innerHTML = `<iconify-icon icon="${isNowSaved ? 'ph:heart-fill' : 'ph:heart'}" aria-hidden="true"></iconify-icon>`;
       }
       this.updateFavCount();
-      showToast(isNowSaved ? '❤️ Event saved!' : '🤍 Event removed');
+      showToast(isNowSaved ? 'Event saved!' : 'Event removed');
     };
   },
 
@@ -574,7 +578,7 @@ const UI = {
           Favorites.toggle(event);
           this.updateFavCount();
           this.showFavorites(); // refresh panel
-          showToast('🤍 Event removed from favorites');
+          showToast('Event removed from favorites');
         });
       });
     }
@@ -685,14 +689,14 @@ const App = {
   async search() {
     const location = document.getElementById('location-input').value.trim();
     if (!location) {
-      showToast('📍 Please enter a city name first');
+      showToast('Please enter a city name first');
       document.getElementById('location-input').focus();
       return;
     }
 
     const hasKey = !!EventbriteAPI.getToken();
     if (!hasKey) {
-      showToast('🔑 No API key configured — showing demo data');
+      showToast('No API key configured — showing demo data');
       this.loadDemoData();
       return;
     }
@@ -714,7 +718,7 @@ const App = {
     } catch (err) {
       console.error('Search failed:', err);
       if (err.message === 'NO_API_KEY') {
-        showToast('🔑 Please add your Eventbrite API key');
+        showToast('Please add your Eventbrite API key');
         this.loadDemoData();
       } else {
         UI.setState('error-state');
@@ -726,39 +730,39 @@ const App = {
   /** Use the browser's Geolocation API */
   useMyLocation() {
     if (!navigator.geolocation) {
-      showToast('⚠️ Geolocation is not supported by your browser');
+      showToast('Geolocation is not supported by your browser');
       return;
     }
 
     const btn = document.getElementById('use-location-btn');
-    btn.textContent = '⌛ Detecting…';
+    btn.innerHTML = '<iconify-icon icon="ph:circle-notch" class="icon-spin" aria-hidden="true"></iconify-icon> Detecting…';
     btn.disabled = true;
 
     navigator.geolocation.getCurrentPosition(
       async (position) => {
-        btn.textContent = '📡 Use My Location';
+        btn.innerHTML = '<iconify-icon icon="ph:navigation-arrow-fill" aria-hidden="true"></iconify-icon> Use My Location';
         btn.disabled = false;
 
         try {
           const { latitude, longitude } = position.coords;
           const city = await EventbriteAPI.reverseGeocode(latitude, longitude);
           document.getElementById('location-input').value = city;
-          showToast(`📍 Location detected: ${city}`);
+          showToast(`Location detected: ${city}`);
           this.search();
         } catch {
-          showToast('⚠️ Could not determine city from coordinates');
+          showToast('Could not determine city from coordinates');
           document.getElementById('location-input').value = `${position.coords.latitude},${position.coords.longitude}`;
         }
       },
       (error) => {
-        btn.textContent = '📡 Use My Location';
+        btn.innerHTML = '<iconify-icon icon="ph:navigation-arrow-fill" aria-hidden="true"></iconify-icon> Use My Location';
         btn.disabled = false;
         const msgs = {
           1: 'Location permission denied',
           2: 'Location unavailable',
           3: 'Location request timed out',
         };
-        showToast(`⚠️ ${msgs[error.code] || 'Could not get your location'}`);
+        showToast(`${msgs[error.code] || 'Could not get your location'}`);
       }
     );
   },
@@ -767,7 +771,7 @@ const App = {
   loadDemoData() {
     UI.allEvents = DEMO_EVENTS.map((ev) => normalizeEvent({ ...ev }, ev._category));
     UI.applyFilterAndRender();
-    showToast('👋 Showing demo events — add your API key to search real events!');
+    showToast('Showing demo events — add your API key to search real events!');
   },
 
   /** Toggle dark mode */
@@ -776,7 +780,8 @@ const App = {
     const next = isDark ? 'light' : 'dark';
     document.documentElement.setAttribute('data-theme', next);
     localStorage.setItem(STORAGE_KEYS.DARK_MODE, next);
-    document.getElementById('dark-mode-toggle').textContent = next === 'dark' ? '☀️' : '🌙';
+    const themeIcon = document.getElementById('theme-icon');
+    if (themeIcon) themeIcon.setAttribute('icon', next === 'dark' ? 'ph:sun-fill' : 'ph:moon-fill');
   },
 
   /** Restore saved theme on load */
@@ -785,7 +790,8 @@ const App = {
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
     const theme = saved || (prefersDark ? 'dark' : 'light');
     document.documentElement.setAttribute('data-theme', theme);
-    document.getElementById('dark-mode-toggle').textContent = theme === 'dark' ? '☀️' : '🌙';
+    const themeIcon = document.getElementById('theme-icon');
+    if (themeIcon) themeIcon.setAttribute('icon', theme === 'dark' ? 'ph:sun-fill' : 'ph:moon-fill');
   },
 
   /** Save the API key from the input field */
@@ -793,22 +799,22 @@ const App = {
     const input = document.getElementById('api-key-input');
     const token = input.value.trim();
     if (!token) {
-      document.getElementById('api-key-status').textContent = '⚠️ Please enter a token.';
+      document.getElementById('api-key-status').textContent = 'Please enter a token.';
       return;
     }
     EventbriteAPI.setToken(token);
     input.value = '';
-    document.getElementById('api-key-status').textContent = '✅ API key saved! Try searching for events.';
+    document.getElementById('api-key-status').textContent = 'API key saved! Try searching for events.';
     this.updateApiKeyUI();
-    showToast('✅ API key saved!');
+    showToast('API key saved!');
   },
 
   /** Clear the stored API key */
   clearApiKey() {
     EventbriteAPI.setToken('');
-    document.getElementById('api-key-status').textContent = '🗑️ API key cleared. Demo mode active.';
+    document.getElementById('api-key-status').textContent = 'API key cleared. Demo mode active.';
     this.updateApiKeyUI();
-    showToast('🗑️ API key removed');
+    showToast('API key removed');
     this.loadDemoData();
   },
 
@@ -817,7 +823,7 @@ const App = {
     const hasKey = !!EventbriteAPI.getToken();
     const statusEl = document.getElementById('api-key-status');
     if (hasKey) {
-      statusEl.textContent = '✅ API key is configured.';
+      statusEl.textContent = 'API key is configured.';
     }
   },
 };
